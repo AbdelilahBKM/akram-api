@@ -17,11 +17,13 @@ class ImageController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = Str::random(10) . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('public/images', $imageName);
+            $path = $image->storeAs('public/images', $imageName);
 
-            // Save $imageName to your database here
+            $imagePath = storage_path('app/public/images/' . $imageName);
+            $imageData = base64_encode(file_get_contents($imagePath));
 
-            return response()->json(['imageName' => $imageName], 200);
+
+            return response()->json(['imageName' => $imageName, 'imageData' => $imageData], 200);
         }
 
         return response()->json(['error' => 'No file uploaded'], 400);

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -22,15 +23,18 @@ class ProductsController extends Controller
     {
         $validatedData = $request->validate([
             'nom_produit' => 'required|unique:produits|max:255',
-            'image_produits' => 'required|unique:produits|max:255',
+            'image_produits' => 'nullable|string',
+            'image_data' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
             'categorie' => 'required|exists:categories,id',
         ]);
 
+        // Create a new product entry in the database
         $produit = Produit::create([
             'nom_produit' => $validatedData['nom_produit'],
-            'image_produits' => $validatedData['image_produits'],
+            'image_produits' => $validatedData['image_produits'] ?? null,
+            'image_data' => $validatedData['image_data'] ?? null, 
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
             'categorie' => $validatedData['categorie'],
@@ -59,13 +63,22 @@ class ProductsController extends Controller
 
         $validatedData = $request->validate([
             'nom_produit' => 'required|max:255|unique:produits,nom_produit,' . $produit->id,
-            'image_produits' => 'required|max:255|unique:produits,image_produits,' . $produit->id,
+            'image_produits' => 'nullable|string',
+            'image_data' => 'nullable|string', // We expect this to be handled by another process
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
             'categorie' => 'required|exists:categories,id',
         ]);
 
-        $produit->update($validatedData);
+        // Update the product entry in the database
+        $produit->update([
+            'nom_produit' => $validatedData['nom_produit'],
+            'image_produits' => $validatedData['image_produits'] ?? $produit->image_produits,
+            'image_data' => $validatedData['image_data'] ?? $produit->image_data, // Expecting image_data to be handled separately
+            'description' => $validatedData['description'],
+            'prix' => $validatedData['prix'],
+            'categorie' => $validatedData['categorie'],
+        ]);
 
         $produit->load('categorie');
 
@@ -78,6 +91,12 @@ class ProductsController extends Controller
     public function destroy(string $id)
     {
         $produit = Produit::findOrFail($id);
+        
+        // Optionally delete associated image if handled within this controller
+        // if ($produit->image_produits) {
+        //     Storage::disk('public')->delete('images/' . $produit->image_produits);
+        // }
+
         $produit->delete();
 
         return response()->json(null, 204);
