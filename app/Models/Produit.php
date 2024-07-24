@@ -16,4 +16,10 @@ class Produit extends Model
         'prix',
         'categorie',
     ];
+
+    // Define the relationship with the Categorie model
+    public function categorie()
+    {
+        return $this->belongsTo(Categorie::class, 'categorie');
+    }
 }

@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Produit;
+
 class ProductsController extends Controller
 {
     /**
@@ -11,7 +11,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $produits = Produit::all();
+        $produits = Produit::with('categorie')->get();
         return response()->json($produits);
     }
 
@@ -36,6 +36,8 @@ class ProductsController extends Controller
             'categorie' => $validatedData['categorie'],
         ]);
 
+        $produit->load('categorie');
+
         return response()->json($produit, 201);
     }
 
@@ -44,7 +46,7 @@ class ProductsController extends Controller
      */
     public function show(string $id)
     {
-        $produit = Produit::findOrFail($id);
+        $produit = Produit::with('categorie')->findOrFail($id);
         return response()->json($produit);
     }
 
@@ -64,6 +66,8 @@ class ProductsController extends Controller
         ]);
 
         $produit->update($validatedData);
+
+        $produit->load('categorie');
 
         return response()->json($produit);
     }
