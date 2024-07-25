@@ -27,6 +27,10 @@ return [
     | Supported drivers: "local", "ftp", "sftp", "s3"
     |
     */
+    'links' => [
+    public_path('storage') => storage_path('app/public'),
+    public_path('images') => storage_path('app/images'),
+    ],
 
     'disks' => [
 

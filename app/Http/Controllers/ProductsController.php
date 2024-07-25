@@ -24,7 +24,6 @@ class ProductsController extends Controller
         $validatedData = $request->validate([
             'nom_produit' => 'required|unique:produits|max:255',
             'image_produits' => 'nullable|string',
-            'image_data' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
             'categorie' => 'required|exists:categories,id',
@@ -34,7 +33,6 @@ class ProductsController extends Controller
         $produit = Produit::create([
             'nom_produit' => $validatedData['nom_produit'],
             'image_produits' => $validatedData['image_produits'] ?? null,
-            'image_data' => $validatedData['image_data'] ?? null, 
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
             'categorie' => $validatedData['categorie'],
@@ -64,7 +62,6 @@ class ProductsController extends Controller
         $validatedData = $request->validate([
             'nom_produit' => 'required|max:255|unique:produits,nom_produit,' . $produit->id,
             'image_produits' => 'nullable|string',
-            'image_data' => 'nullable|string', // We expect this to be handled by another process
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
             'categorie' => 'required|exists:categories,id',
@@ -74,7 +71,6 @@ class ProductsController extends Controller
         $produit->update([
             'nom_produit' => $validatedData['nom_produit'],
             'image_produits' => $validatedData['image_produits'] ?? $produit->image_produits,
-            'image_data' => $validatedData['image_data'] ?? $produit->image_data, // Expecting image_data to be handled separately
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
             'categorie' => $validatedData['categorie'],
