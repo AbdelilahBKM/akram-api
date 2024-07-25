@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -20,6 +21,9 @@ Route::get('produits/{id}', [ProductsController::class, 'show'])->name('produits
 
 Route::get('categories', [CategoriesController::class, 'index'])->name('categories.index');
 Route::get('categories/{id}', [CategoriesController::class, 'show'])->name('categories.show');
+
+Route::post('contact', [ContactController::class, 'store'])->name('contact.index');
+
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -42,4 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ################ Logout #######################
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // ################ Contact info ####################
+    Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
+    Route::get('contact/{id}', [ContactController::class, 'show'])->name('contact.show');
+    Route::put('contact/{id}', [ContactController::class, 'update'])->name('contact.update');
+    Route::delete('contact/{id}', [ContactController::class, 'destroy'])->name('contact.destroy');
 });
