@@ -20,6 +20,6 @@ class Produit extends Model
     // Define the relationship with the Categorie model
     public function categorie()
     {
-        return $this->belongsTo(SubCategorie::class, 'categorie');
+        return $this->belongsTo(Categorie::class, 'categorie');
     }
 }

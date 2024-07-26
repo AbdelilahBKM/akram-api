@@ -26,7 +26,7 @@ class ProductsController extends Controller
             'image_produits' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
-            'sub_categorie' => 'required|exists:sub_categories,id',
+            'categorie' => 'required|exists:categories,id',
         ]);
 
         // Create a new product entry in the database
@@ -35,10 +35,10 @@ class ProductsController extends Controller
             'image_produits' => $validatedData['image_produits'] ?? null,
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
-            'sub_categorie' => $validatedData['sub_categorie'],
+            'categorie' => $validatedData['categorie'],
         ]);
 
-        $produit->load('sub_categorie');
+        $produit->load('categorie');
 
         return response()->json($produit, 201);
     }
@@ -64,7 +64,7 @@ class ProductsController extends Controller
             'image_produits' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
-            'sub_categorie' => 'required|exists:sub_categories,id',
+            'categorie' => 'required|exists:categories,id',
         ]);
 
         // Update the product entry in the database
@@ -73,10 +73,10 @@ class ProductsController extends Controller
             'image_produits' => $validatedData['image_produits'] ?? $produit->image_produits,
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
-            'sub_categorie' => $validatedData['sub_categorie'],
+            'categorie' => $validatedData['categorie'],
         ]);
 
-        $produit->load('sub_categorie');
+        $produit->load('categorie');
 
         return response()->json($produit);
     }
