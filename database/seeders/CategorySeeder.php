@@ -17,14 +17,14 @@ class CategorySeeder extends Seeder
     {
         DB::table('categories')->insert([
             [
-                'nom_categorie' => 'Salon',
-                'description_categorie' => 'Salon',
+                'nom_categorie' => 'Tissus',
+                'description_categorie' => 'Tissus',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'nom_categorie' => 'Tissus',
-                'description_categorie' => 'Tissus',
+                'nom_categorie' => 'Salon',
+                'description_categorie' => 'Salon',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

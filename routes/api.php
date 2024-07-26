@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\SubCategorieController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -22,9 +23,10 @@ Route::get('produits/{id}', [ProductsController::class, 'show'])->name('produits
 Route::get('categories', [CategoriesController::class, 'index'])->name('categories.index');
 Route::get('categories/{id}', [CategoriesController::class, 'show'])->name('categories.show');
 
+Route::get('sub-categories', [SubCategorieController::class, 'index'])->name('sub-categories.index');
+Route::get('sub-categories/{id}', [SubCategorieController::class, 'show'])->name('sub-categories.show');
+
 Route::post('contact', [ContactController::class, 'store'])->name('contact.index');
-
-
 
 Route::middleware('auth:sanctum')->group(function () {
     // ############ Products ######################
@@ -40,6 +42,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('categories/{id}/edit', [CategoriesController::class, 'edit'])->name('categories.edit');
     Route::put('categories/{id}', [CategoriesController::class, 'update'])->name('categories.update');
     Route::delete('categories/{id}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
+
+    //  ########### Sub Categories ######################
+    Route::get('sub-categories/create', [SubCategorieController::class, 'create'])->name('sub-categories.create');
+    Route::post('sub-categories', [SubCategorieController::class, 'store'])->name('sub-categories.store');
+    Route::get('sub-categories/{id}/edit', [SubCategorieController::class, 'edit'])->name('sub-categories.edit');
+    Route::put('sub-categories/{id}', [SubCategorieController::class, 'update'])->name('sub-categories.update');
+    Route::delete('sub-categories/{id}', [SubCategorieController::class, 'destroy'])->name('sub-categories.destroy');
+
 
     // ################ Image Upload ################
     Route::post('/upload-image', [ImageController::class, 'uploadImage'])->name('upload.image');

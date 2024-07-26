@@ -12,7 +12,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $produits = Produit::with('categorie')->get();
+        $produits = Produit::with('sub_categorie')->get();
         return response()->json($produits);
     }
 
@@ -26,7 +26,7 @@ class ProductsController extends Controller
             'image_produits' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
-            'categorie' => 'required|exists:categories,id',
+            'sub_categorie' => 'required|exists:sub_categories,id',
         ]);
 
         // Create a new product entry in the database
@@ -35,10 +35,10 @@ class ProductsController extends Controller
             'image_produits' => $validatedData['image_produits'] ?? null,
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
-            'categorie' => $validatedData['categorie'],
+            'sub_categorie' => $validatedData['sub_categorie'],
         ]);
 
-        $produit->load('categorie');
+        $produit->load('sub_categorie');
 
         return response()->json($produit, 201);
     }
@@ -64,7 +64,7 @@ class ProductsController extends Controller
             'image_produits' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
-            'categorie' => 'required|exists:categories,id',
+            'sub_categorie' => 'required|exists:sub_categories,id',
         ]);
 
         // Update the product entry in the database
@@ -73,10 +73,10 @@ class ProductsController extends Controller
             'image_produits' => $validatedData['image_produits'] ?? $produit->image_produits,
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
-            'categorie' => $validatedData['categorie'],
+            'sub_categorie' => $validatedData['sub_categorie'],
         ]);
 
-        $produit->load('categorie');
+        $produit->load('sub_categorie');
 
         return response()->json($produit);
     }

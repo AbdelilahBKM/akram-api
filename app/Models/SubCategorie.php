@@ -5,21 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Produit extends Model
+class SubCategorie extends Model
 {
     use HasFactory;
-    
     protected $fillable = [
-        'nom_produit',
-        'image_produits',
+        'valeur_sous_categorie',
+        'nom_sous_categorie',
         'description',
-        'prix',
-        'sub_categorie',
+        'categorie',
     ];
-
-    // Define the relationship with the Categorie model
     public function categorie()
     {
-        return $this->belongsTo(SubCategorie::class, 'categorie');
+        return $this->belongsTo(Categorie::class, 'categorie');
     }
 }
