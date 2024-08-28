@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Produit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductsController extends Controller
 {
@@ -12,7 +14,8 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $produits = Produit::with('sub_categorie')->get();
+        // Eager load categories to include them in the response
+        $produits = Produit::with('categories')->get();
         return response()->json($produits);
     }
 
@@ -21,24 +24,26 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate incoming request data
         $validatedData = $request->validate([
-            'nom_produit' => 'required|unique:produits|max:255',
-            'image_produits' => 'nullable|string',
+            'nom_produit' => 'required|unique:produits,nom_produit|max:255',
+            'image_produit' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
-            'sub_categorie' => 'required|exists:sub_categories,id',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
         ]);
 
-        // Create a new product entry in the database
+        // Create a new product
         $produit = Produit::create([
             'nom_produit' => $validatedData['nom_produit'],
-            'image_produits' => $validatedData['image_produits'] ?? null,
+            'image_produit' => $validatedData['image_produit'] ?? null,
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
-            'sub_categorie' => $validatedData['sub_categorie'],
         ]);
 
-        $produit->load('sub_categorie');
+        // Sync categories with the product
+        $produit->categories()->sync($validatedData['categories']);
 
         return response()->json($produit, 201);
     }
@@ -46,37 +51,43 @@ class ProductsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        $produit = Produit::with('categorie')->findOrFail($id);
+        // Find product with related categories
+        $produit = Produit::with('categories')->findOrFail($id);
         return response()->json($produit);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
+        // Find the product
         $produit = Produit::findOrFail($id);
 
+        // Validate incoming request data
         $validatedData = $request->validate([
             'nom_produit' => 'required|max:255|unique:produits,nom_produit,' . $produit->id,
-            'image_produits' => 'nullable|string',
+            'image_produit' => 'nullable|string',
             'description' => 'nullable|max:255',
             'prix' => 'required|numeric',
-            'sub_categorie' => 'required|exists:sub_categories,id',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id',
         ]);
 
-        // Update the product entry in the database
+        // Update the product
         $produit->update([
             'nom_produit' => $validatedData['nom_produit'],
-            'image_produits' => $validatedData['image_produits'] ?? $produit->image_produits,
+            'image_produit' => $validatedData['image_produit'] ?? $produit->image_produit,
             'description' => $validatedData['description'],
             'prix' => $validatedData['prix'],
-            'sub_categorie' => $validatedData['sub_categorie'],
         ]);
 
-        $produit->load('sub_categorie');
+        // Sync categories if provided
+        if (isset($validatedData['categories'])) {
+            $produit->categories()->sync($validatedData['categories']);
+        }
 
         return response()->json($produit);
     }
@@ -84,15 +95,24 @@ class ProductsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
+        // Find the product
         $produit = Produit::findOrFail($id);
-        
-        // Optionally delete associated image if handled within this controller
-        // if ($produit->image_produits) {
-        //     Storage::disk('public')->delete('images/' . $produit->image_produits);
-        // }
 
+        // Optionally delete associated image if needed
+        if ($produit->image_produit) {
+            // Prepend the directory path where images are stored
+            $imagePath = 'images/' . $produit->image_produit;
+
+            // Check if the file exists before attempting to delete
+            if (Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
+
+        // Detach categories and delete the product
+        $produit->categories()->detach();
         $produit->delete();
 
         return response()->json(null, 204);

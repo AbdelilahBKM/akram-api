@@ -12,4 +12,9 @@ class Categorie extends Model
         'nom_categorie',
         'description_categorie',
     ];
+
+    public function products()
+    {
+        return $this->belongsToMany(Produit::class, 'product_category');
+    }
 }

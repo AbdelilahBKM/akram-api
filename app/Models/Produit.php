@@ -18,8 +18,9 @@ class Produit extends Model
     ];
 
     // Define the relationship with the Categorie model
-    public function categorie()
+    public function categories()
     {
-        return $this->belongsTo(SubCategorie::class, 'categorie');
+    return $this->belongsToMany(Categorie::class, 'product_category');
     }
+
 }

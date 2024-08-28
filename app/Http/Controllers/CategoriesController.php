@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Categorie;
+use Illuminate\Http\Request;
 
 class CategoriesController extends Controller
 {
@@ -12,7 +13,8 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Categorie::all();
+        // Retrieve all categories with their children
+        $categories = Categorie::with('children')->get();
         return response()->json($categories);
     }
 
@@ -21,15 +23,14 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate incoming request data
         $validatedData = $request->validate([
-            'nom_categorie' => 'required|unique:categories|max:255',
-            'description_categorie' => 'nullable|max:255',
+            'nom_categorie' => 'required|string|max:255|unique:categories,nom_categorie',
+            'description_categorie' => 'nullable|string', 
+            'parent_categorie' => 'nullable|exists:categories,id',
         ]);
 
-        $categorie = Categorie::create([
-            'nom_categorie' => $validatedData['nom_categorie'],
-            'description_categorie' => $validatedData['description_categorie'],
-        ]);
+        $categorie = Categorie::create($validatedData);
 
         return response()->json($categorie, 201);
     }
@@ -37,24 +38,29 @@ class CategoriesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        $categorie = Categorie::findOrFail($id);
+        // Find the category with its children
+        $categorie = Categorie::with('children')->findOrFail($id);
         return response()->json($categorie);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
+        // Find the category
         $categorie = Categorie::findOrFail($id);
 
+        // Validate incoming request data
         $validatedData = $request->validate([
-            'nom_categorie' => 'required|max:255|unique:categories,nom_categorie,' . $categorie->id,
-            'description_categorie' => 'nullable|max:255',
+            'nom_categorie' => 'required|string|max:255|unique:categories,nom_categorie,' . $categorie->id,
+            'description_categorie' => 'nullable|string', 
+            'parent_categorie' => 'nullable|exists:categories,id',
         ]);
 
+        // Update the category
         $categorie->update($validatedData);
 
         return response()->json($categorie);
@@ -63,9 +69,15 @@ class CategoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
+        // Find the category
         $categorie = Categorie::findOrFail($id);
+
+        // Optionally handle subcategories
+        $categorie->children()->delete();
+
+        // Delete the category
         $categorie->delete();
 
         return response()->json(null, 204);
