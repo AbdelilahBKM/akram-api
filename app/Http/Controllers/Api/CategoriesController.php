@@ -14,7 +14,7 @@ class CategoriesController extends Controller
     public function index()
     {
         // Retrieve all categories with their children
-        $categories = Categorie::with('children')->get();
+        $categories = Categorie::with('children')->whereNull('parent_categorie')->get();
         return response()->json($categories);
     }
 
@@ -25,8 +25,8 @@ class CategoriesController extends Controller
     {
         // Validate incoming request data
         $validatedData = $request->validate([
-            'nom_categorie' => 'required|string|max:255|unique:categories,nom_categorie',
-            'description_categorie' => 'nullable|string', 
+            'nom_categorie' => 'required|string|max:255',
+            'description_categorie' => 'nullable|string',
             'parent_categorie' => 'nullable|exists:categories,id',
         ]);
 
@@ -45,6 +45,12 @@ class CategoriesController extends Controller
         return response()->json($categorie);
     }
 
+    public function show_by_slug($slug)
+    {
+        $categorie = Categorie::with('children')->where('nom_categorie', $slug)->firstOrFail();
+        return response()->json($categorie);
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -56,7 +62,7 @@ class CategoriesController extends Controller
         // Validate incoming request data
         $validatedData = $request->validate([
             'nom_categorie' => 'required|string|max:255|unique:categories,nom_categorie,' . $categorie->id,
-            'description_categorie' => 'nullable|string', 
+            'description_categorie' => 'nullable|string',
             'parent_categorie' => 'nullable|exists:categories,id',
         ]);
 

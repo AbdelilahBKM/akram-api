@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('nom_client');
             $table->string('email_client');
             $table->longText('message_client');
+            $table->string('numero_tel')->nullable();
+            $table->string('pays')->nullable();
+            $table->boolean('is_new')->default(true);
             $table->timestamps();
         });
     }

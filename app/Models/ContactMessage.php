@@ -12,5 +12,8 @@ class ContactMessage extends Model
         'nom_client',
         'email_client',
         'message_client',
+        'pays',
+        'numero_tel',
+        'is_new'
     ];
 }
