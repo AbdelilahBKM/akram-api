@@ -121,7 +121,7 @@ class ProductsController extends Controller
             'categories.*' => 'exists:categories,id',
             'en_promotion' => 'required|boolean',
             'remise' => 'nullable|numeric',
-            'date_limit_promotion' => 'required|date',
+            'date_limit_promotion' => 'nullable|date',
             'categorie' => 'required|exists:categories,id',
         ]);
 
